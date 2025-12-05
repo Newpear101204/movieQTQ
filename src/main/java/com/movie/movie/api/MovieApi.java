@@ -1,0 +1,88 @@
+package com.movie.movie.api;
+
+import com.movie.movie.entity.Genres;
+import com.movie.movie.model.dto.MovieDTO;
+import com.movie.movie.model.dto.PersonDTO;
+import com.movie.movie.model.request.SearchMovieRequest;
+import com.movie.movie.model.response.PersonResponse;
+import com.movie.movie.model.response.SearchResponse;
+import com.movie.movie.service.GenresService;
+import com.movie.movie.service.MovieService;
+import com.movie.movie.service.PersonsService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/movie/")
+public class MovieApi {
+    @Autowired
+    private GenresService genresService;
+
+    @Autowired
+    private MovieService movieService;
+
+    @Autowired
+    private PersonsService personService;
+
+    @Autowired
+    private PersonsService personsService;
+
+
+    //api xử lí thanh tìm kiếm
+    @GetMapping
+    public SearchResponse getMovie(@RequestBody SearchMovieRequest searchMovieDTO) {
+        SearchResponse searchResponse = new SearchResponse();
+        searchResponse.setMovieSearch(movieService.getMovie(searchMovieDTO.getTextSearch()));
+        searchResponse.setCastSearch(personsService.getCast(searchMovieDTO.getTextSearch()));
+        return searchResponse;
+    }
+
+    @PostMapping
+    public void addMovie(@RequestBody MovieDTO movieDTO){
+// them mot bo phim
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteMovie(@PathVariable Long id) {
+        movieService.deleteMovie(id);
+    }
+
+    @PatchMapping("/{id}")
+    public void updateMovie(@PathVariable int id, @RequestBody MovieDTO movieDTO) {
+// cap nhat thong tin cua bo phim
+    }
+
+    @GetMapping("/genre")
+    public List<Genres> getGenre() {
+        return genresService.getAllGenres();
+    }
+
+    @GetMapping("/{id}/actor")
+    public PersonResponse getActor(@PathVariable Long id) {
+        return movieService.getPersons(id);
+    }
+
+    @GetMapping("/actor/{id}")
+    public void getMovieOfActor(@PathVariable Long id) {
+        // lay danh sach bo phim cua mot dien vien
+
+    }
+
+    @DeleteMapping("/actor/{id}")
+    public void deleteActor(@PathVariable Long id) {
+        personService.deleteCast(id);
+    }
+
+    @PostMapping("/actor")
+    public void addActor(@RequestBody PersonDTO personDTO) {
+  // them dien vien
+    }
+
+    @PatchMapping("/actor/{id}")
+    public void updateActor(@PathVariable int id, @RequestBody PersonDTO personDTO) {
+        // cap nhat dien vien
+    }
+
+}
