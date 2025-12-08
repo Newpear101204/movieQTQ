@@ -67,7 +67,7 @@ public class MovieApi {
     @GetMapping("/actor/{id}")
     public void getMovieOfActor(@PathVariable Long id) {
         // lay danh sach bo phim cua mot dien vien
-
+        personService.getMoviesOfCast(id);
     }
 
     @DeleteMapping("/actor/{id}")
