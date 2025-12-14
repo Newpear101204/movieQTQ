@@ -1,7 +1,12 @@
 package com.movie.movie.service.impl;
 
+import com.movie.movie.convert.EntityToResponse;
+import com.movie.movie.entity.MovieCast;
+import com.movie.movie.entity.MovieCrew;
+import com.movie.movie.entity.Movies;
 import com.movie.movie.entity.Persons;
 import com.movie.movie.model.response.CastResponse;
+import com.movie.movie.model.response.MovieResponse;
 import com.movie.movie.repository.PersonsRepository;
 import com.movie.movie.service.PersonsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,5 +41,18 @@ public class PersonsServiceImpl implements PersonsService {
     @Override
     public void deleteCast(Long id) {
         personsRepository.deleteById(id);
+    }
+
+    @Override
+    public List<MovieResponse> getMoviesOfCast(Long id) {
+        Persons persons = personsRepository.findById(id).get();
+        List<MovieCast> movieCasts = persons.getMovieCasts();
+        List<MovieResponse> movieResponses = new ArrayList<>();
+        for (MovieCast movieCast : movieCasts) {
+            Movies movies = movieCast.getMovie();
+            MovieResponse movieResponse = EntityToResponse.convertFromMovie(movies);
+            movieResponses.add(movieResponse);
+        }
+        return movieResponses;
     }
 }

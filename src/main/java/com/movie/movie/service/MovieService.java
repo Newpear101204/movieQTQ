@@ -10,4 +10,5 @@ public interface MovieService {
     List<MovieResponse> getHistory();
     void deleteMovie(Long id);
     PersonResponse getPersons (Long id);
+    void addMovie(MovieResponse movie);
 }

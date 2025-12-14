@@ -4,6 +4,7 @@ import com.movie.movie.entity.Genres;
 import com.movie.movie.model.dto.MovieDTO;
 import com.movie.movie.model.dto.PersonDTO;
 import com.movie.movie.model.request.SearchMovieRequest;
+import com.movie.movie.model.response.MovieResponse;
 import com.movie.movie.model.response.PersonResponse;
 import com.movie.movie.model.response.SearchResponse;
 import com.movie.movie.service.GenresService;
@@ -41,8 +42,8 @@ public class MovieApi {
     }
 
     @PostMapping
-    public void addMovie(@RequestBody MovieDTO movieDTO){
-// them mot bo phim
+    public void addMovie(@RequestBody MovieResponse movieResponse){
+        movieService.addMovie(movieResponse);
     }
 
     @DeleteMapping("/{id}")
@@ -51,8 +52,8 @@ public class MovieApi {
     }
 
     @PatchMapping("/{id}")
-    public void updateMovie(@PathVariable int id, @RequestBody MovieDTO movieDTO) {
-// cap nhat thong tin cua bo phim
+    public void updateMovie(@PathVariable int id, @RequestBody MovieResponse movieResponse) {
+        movieService.addMovie(movieResponse);
     }
 
     @GetMapping("/genre")
@@ -67,8 +68,7 @@ public class MovieApi {
 
     @GetMapping("/actor/{id}")
     public void getMovieOfActor(@PathVariable Long id) {
-        // lay danh sach bo phim cua mot dien vien
-
+        personService.getMoviesOfCast(id);
     }
 
     @DeleteMapping("/actor/{id}")

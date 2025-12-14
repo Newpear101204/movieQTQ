@@ -7,10 +7,7 @@ import com.movie.movie.model.response.CastResponse;
 import com.movie.movie.model.response.LoginResponse;
 import com.movie.movie.model.response.MovieResponse;
 import com.movie.movie.model.response.UsersResponse;
-import com.movie.movie.service.MovieService;
-import com.movie.movie.service.UserActorListService;
-import com.movie.movie.service.UserWatchListService;
-import com.movie.movie.service.UsersService;
+import com.movie.movie.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +28,9 @@ public class UserApi {
 
     @Autowired
     private UserWatchListService userWatchListService;
+
+    @Autowired
+    private WatchHistoryService watchHistoryService;
 
     @Autowired
     private UserActorListService userActorListService;
@@ -62,10 +62,10 @@ public class UserApi {
         return movieService.getHistory();
     }
 
-//    @PostMapping("/history/{id}")
-//    public void addHistory(@PathVariable Integer id){
-//        // Them bo phim vao trong lich su da xem
-//    }
+    @PostMapping("/history/{id}")
+    public void addHistory(@PathVariable Long id){
+        watchHistoryService.addToHistory(id);
+    }
 
     @PostMapping("/watch-list/{id}")
     public void addToWatchList(@PathVariable Long id){

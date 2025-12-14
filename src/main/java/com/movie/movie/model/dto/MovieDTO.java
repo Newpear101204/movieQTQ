@@ -24,5 +24,5 @@ public class MovieDTO {
     Integer runtime;
     Integer countryId;
     String type ;
-    String ageRating;
+    String ageRating; // bo
 }
