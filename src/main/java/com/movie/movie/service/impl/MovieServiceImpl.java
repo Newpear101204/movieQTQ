@@ -2,12 +2,8 @@ package com.movie.movie.service.impl;
 
 import com.movie.movie.convert.EntityToResponse;
 import com.movie.movie.entity.*;
-import com.movie.movie.model.response.CastResponse;
-import com.movie.movie.model.response.DirectorResponse;
-import com.movie.movie.model.response.MovieResponse;
-import com.movie.movie.model.response.PersonResponse;
-import com.movie.movie.repository.MoviesRepository;
-import com.movie.movie.repository.UsersRepository;
+import com.movie.movie.model.response.*;
+import com.movie.movie.repository.*;
 import com.movie.movie.service.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,6 +19,21 @@ public class MovieServiceImpl implements MovieService {
 
     @Autowired
     private UsersRepository usersRepository;
+
+    @Autowired
+    private CountriesRepository countriesRepository;
+
+    @Autowired
+    private PersonsRepository personsRepository;
+
+    @Autowired
+    private EpisodeRepsitory episodeRepository;
+
+    @Autowired
+    private GenresRepository genresRepository;
+
+
+
 
     @Override
     public List<MovieResponse> getMovie(String text) {
@@ -76,5 +87,53 @@ public class MovieServiceImpl implements MovieService {
             directorResponses.add(directorResponse);
         }
         return new PersonResponse(castResponses, directorResponses);
+    }
+
+    @Override
+    public void addMovie(MovieResponse movie) {
+        Movies movies = new Movies();
+        movies.setTitle(movie.getTitle());
+        movies.setDescription(movie.getDescription());
+        movies.setCountry(countriesRepository.findByCountryName(movie.getCountry()));
+        movies.setPosterUrl(movie.getPoster());
+        movies.setRuntime(movie.getDuration());
+        movies.setSlug(movie.getSlug());
+        movies.setSubtTitle(movie.getSubTitle());
+        movies.setVideoUrl(movie.getVideoUrl());
+        List<MovieCast> listMovieCast = new ArrayList<>();
+        for(CastResponse cast : movie.getCast() ){
+            Persons persons = personsRepository.findById(cast.getId()).get();
+            MovieCast movieCast = new MovieCast();
+            movieCast.setPerson(persons);
+            movieCast.setMovie(movies);
+        }
+        movies.setCasts(listMovieCast);
+        List<Episodes> episodesList = new ArrayList<>();
+        for (EpisodeResponse episode : movie.getEpisodes()) {
+            Episodes episodes = new Episodes();
+            episodes.setTitle(episode.getTitle());
+            episodes.setVideoUrl(episode.getVideoUrl());
+            episodeRepository.save(episodes);
+            episodesList.add(episodes);
+        }
+        Seasons seasons = new Seasons();
+        seasons.setTitle(movie.getTitle());
+        seasons.setMovie(movies);
+        seasons.setEpisodes(episodesList);
+        List<Seasons> seasonsList = new ArrayList<>();
+        seasonsList.add(seasons);
+        movies.setSeasons(seasonsList);
+
+        List<MovieGenres> movieGenres = new ArrayList<>();
+        for(String genre : movie.getGenres()){
+            Genres genres = genresRepository.findByGenreName(genre);
+            MovieGenres movieGenre = new MovieGenres();
+            movieGenre.setGenre(genres);
+            movieGenre.setMovie(movies);
+            movieGenres.add(movieGenre);
+        }
+        movies.setMovieGenres(movieGenres);
+        moviesRepository.save(movies);
+
     }
 }
