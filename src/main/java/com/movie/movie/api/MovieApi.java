@@ -16,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/movie/")
+@CrossOrigin(origins = "http://localhost:3000")
 public class MovieApi {
     @Autowired
     private GenresService genresService;

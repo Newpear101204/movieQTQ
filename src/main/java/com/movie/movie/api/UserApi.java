@@ -12,12 +12,15 @@ import com.movie.movie.service.UserActorListService;
 import com.movie.movie.service.UserWatchListService;
 import com.movie.movie.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/user/")
+@CrossOrigin(origins = "http://localhost:3000")
 public class UserApi {
 
     @Autowired
@@ -32,15 +35,22 @@ public class UserApi {
     @Autowired
     private UserActorListService userActorListService;
 
-    @GetMapping("/login")
+    @PostMapping("/login")
     public LoginResponse login (@RequestBody LoginDTO loginDTO) {
         return usersService.login(loginDTO);
     }
 
+//    @PostMapping("/register")
+//    public void register (@RequestBody RegisterDTO registerDTO) {
+//        usersService.register(registerDTO);
+//    }
+
     @PostMapping("/register")
-    public void register (@RequestBody RegisterDTO registerDTO) {
+    public ResponseEntity<?> register(@RequestBody RegisterDTO registerDTO) {
         usersService.register(registerDTO);
+        return ResponseEntity.ok(Map.of("message", "Register success"));
     }
+
 
     @PatchMapping("/update")
     public void update(@RequestBody UpdateUserDTO updateUserDTO){
