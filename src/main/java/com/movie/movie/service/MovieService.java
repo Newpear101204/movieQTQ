@@ -11,4 +11,7 @@ public interface MovieService {
     void deleteMovie(Long id);
     PersonResponse getPersons (Long id);
     void addMovie(MovieResponse movie);
+    MovieResponse getMovieDetail(String slug);
+    void increaseViewCount(Long id);
+    List<MovieResponse> getTrendingMovies();
 }

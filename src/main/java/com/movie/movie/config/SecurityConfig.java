@@ -5,6 +5,7 @@ import com.movie.movie.service.impl.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -64,9 +65,29 @@ public class SecurityConfig {
                 .authorizeHttpRequests(requests -> {
                     requests
                             .requestMatchers(
-                                    "/user/login", "/user/register", "/movie/"
-                            )
-                            .permitAll().anyRequest().authenticated();
+                                    "/user/login", "/user/register"
+                            ).permitAll()
+                            // 2. Cho phép XEM phim (GET) công khai cho tất cả mọi người
+                            .requestMatchers(HttpMethod.POST, "/movie/search").permitAll()
+                            .requestMatchers(HttpMethod.GET, "/movie/detail/**").permitAll()
+                            .requestMatchers(HttpMethod.GET, "/user/person/").permitAll()
+                            .requestMatchers(HttpMethod.POST, "/movie/view/**").permitAll()
+                            .requestMatchers(HttpMethod.GET, "/movie/trending").permitAll()
+                            .requestMatchers(HttpMethod.GET, "/movie/recommend").permitAll()
+                            // 2. Private APIs (Cần Token)
+                            .requestMatchers("/movie/{id}").authenticated()
+                            .requestMatchers(HttpMethod.POST,"/movie/{id}").authenticated()
+                            .requestMatchers(HttpMethod.POST, "/movie/").authenticated()
+                            // Cho phép user thao tác với watch-list
+                            .requestMatchers(HttpMethod.GET,"/user").authenticated()
+                            .requestMatchers(HttpMethod.DELETE,"/user/{id}").authenticated()
+                            .requestMatchers("/user/watch-list/**").authenticated()
+                            .requestMatchers("/user/actor/**").authenticated()
+                            .requestMatchers("/user/history/**").authenticated()
+                            .requestMatchers("/user/profile").authenticated()
+                            .requestMatchers("/user/update").authenticated()
+                            .requestMatchers("/user/change-password").authenticated()
+                            .anyRequest().authenticated();
 //                            .requestMatchers(POST, "/shopqtq/createproduct").hasAnyRole("ADMIN")
 //                            .requestMatchers(DELETE, "/shopqtq/deleteproduct/{id}").hasAnyRole("ADMIN")
 //                            .requestMatchers(DELETE, "/shopqtq/deleteproductimage").hasAnyRole("ADMIN")

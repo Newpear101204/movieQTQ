@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface PersonsRepository extends JpaRepository<Persons, Long> {
     List<Persons> findByFullNameContaining(String keyword);
+
+    Persons findBySlug(String slug);
 }

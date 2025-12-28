@@ -22,4 +22,5 @@ public class UsersResponse {
     String role ;
     Boolean isActive ;
     LocalDateTime createdAt;
+    String gender;
 }

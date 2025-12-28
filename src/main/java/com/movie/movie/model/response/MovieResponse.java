@@ -28,4 +28,5 @@ public class MovieResponse {
     String description;
     List<CastResponse> cast;
     List<EpisodeResponse> episodes;
+    boolean isMovieLove;
 }

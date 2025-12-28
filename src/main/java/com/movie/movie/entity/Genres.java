@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -30,6 +31,9 @@ public class Genres {
 
     @Column(name = "description", columnDefinition = "TEXT")
     String description;
+
+    @OneToMany(mappedBy = "genre", cascade = CascadeType.ALL)
+    List<MovieGenres> movieGenres;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

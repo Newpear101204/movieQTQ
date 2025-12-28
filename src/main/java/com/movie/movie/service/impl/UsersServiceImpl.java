@@ -5,6 +5,7 @@ import com.movie.movie.entity.*;
 import com.movie.movie.exception.AccountExist;
 import com.movie.movie.exception.DataNotFoundException;
 import com.movie.movie.exception.DuplicatedUsername;
+import com.movie.movie.model.dto.ChangePasswordDTO;
 import com.movie.movie.model.dto.LoginDTO;
 import com.movie.movie.model.dto.RegisterDTO;
 import com.movie.movie.model.dto.UpdateUserDTO;
@@ -23,12 +24,14 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @Service
 public class UsersServiceImpl implements UsersService {
@@ -52,6 +55,9 @@ public class UsersServiceImpl implements UsersService {
 
     @Autowired
     private WatchHistoryRepository watchHistoryRepository;
+
+    @Autowired
+    private EntityToResponse entityToResponse;
 
     @Override
     public LoginResponse login(LoginDTO loginDTO) {
@@ -101,6 +107,7 @@ public class UsersServiceImpl implements UsersService {
         users.setPassword(encodedPassword);
         users.setRole("user");
         users.setIsActive(true);
+        users.setAvatarUrl("https://i.pravatar.cc/300?img="+ new Random().nextInt(100));
         usersRepository.save(users);
     }
 
@@ -115,20 +122,41 @@ public class UsersServiceImpl implements UsersService {
         return usersResponseList;
     }
 
+//    @Override
+//    public void deleteUser(Long id) {
+//        usersRepository.deleteById(id);
+//    }
     @Override
     public void deleteUser(Long id) {
-        usersRepository.deleteById(id);
+        Users user = usersRepository.findById(id).get();
+        user.setIsActive(false);
+        usersRepository.save(user);
+    }
+
+    @Override
+    public void changePassword(ChangePasswordDTO request) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Users user = usersRepository.findByUsername(username);
+
+        // 1. Kiểm tra mật khẩu cũ có đúng không
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            throw new RuntimeException("Mật khẩu hiện tại không chính xác");
+        }
+
+        // 3. Mã hóa mật khẩu mới và lưu
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        usersRepository.save(user);
     }
 
     @Override
     public void updateUser(UpdateUserDTO updateUserDTO) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Users users = usersRepository.findByUsername(username);
-        users.setUsername(updateUserDTO.getUsername());
-        users.setPassword(updateUserDTO.getPassword());
+//        users.setUsername(updateUserDTO.getUsername());
+//        users.setPassword(updateUserDTO.getPassword());
         users.setFullName(updateUserDTO.getFullName());
-        users.setPhone(updateUserDTO.getPhone());
-        users.setDateOfBirth(updateUserDTO.getDateOfBirth());
+//        users.setPhone(updateUserDTO.getPhone());
+//        users.setDateOfBirth(updateUserDTO.getDateOfBirth());
         users.setGender(updateUserDTO.getGender());
         users.setAvatarUrl(updateUserDTO.getAvatarUrl());
         usersRepository.save(users);
@@ -150,7 +178,7 @@ public class UsersServiceImpl implements UsersService {
         List<MovieResponse> movieResponseList = new ArrayList<>();
         for (UserWatchList userWatchList : userWatchLists) {
             Movies movies = userWatchList.getMovie();
-            MovieResponse moviesResponse = EntityToResponse.convertFromMovie(movies);
+            MovieResponse moviesResponse = entityToResponse.convertFromMovie(movies);
             movieResponseList.add(moviesResponse);
         }
         return movieResponseList;
@@ -164,11 +192,32 @@ public class UsersServiceImpl implements UsersService {
         List<CastResponse> castResponseList = new ArrayList<>();
         for (UserActorList userActorList : userActorLists) {
             Persons person = userActorList.getPerson();
-            CastResponse castResponse = new CastResponse(person.getId(), person.getFullName(),
-                    person.getSlug(), person.getAvatarUrl(), person.getGender(),person.getDateOfBirth());
+//            CastResponse castResponse = new CastResponse(person.getId(), person.getFullName(),
+//                    person.getSlug(), person.getAvatarUrl(), person.getGender(),person.getDateOfBirth());
+            CastResponse castResponse = new CastResponse();
+            castResponse.setId(person.getId());
+            castResponse.setName(person.getFullName());
+            castResponse.setSlug(person.getSlug());
+            castResponse.setImage(person.getAvatarUrl());
+            castResponse.setGender(person.getGender());
+            castResponse.setDob(person.getDateOfBirth());
+//            CastResponse castResponse = modelMapper.map(person, CastResponse.class);
+
             castResponseList.add(castResponse);
         }
         return castResponseList;
+    }
+
+    @Override
+    public UsersResponse getMyInfo() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Users users = usersRepository.findByUsername(username);
+
+        if (users == null) {
+            throw new RuntimeException("Không tìm thấy người dùng");
+        }
+
+        return modelMapper.map(users, UsersResponse.class);
     }
 
 

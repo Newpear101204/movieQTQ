@@ -17,4 +17,5 @@ public class CastResponse {
     String image;  // avatarUrl
     String gender;
     LocalDate dob ; // DateOfBirth
+    boolean isActorLove;
 }

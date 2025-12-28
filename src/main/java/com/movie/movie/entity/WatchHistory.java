@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -49,14 +51,14 @@ public class WatchHistory {
     @Column(name = "total_duration")
     Integer totalDuration; // Tổng thời lượng video (giây)
 
-    @Column(name = "progress_percentage", precision = 5, scale = 2)
-    BigDecimal progressPercentage; // Phần trăm hoàn thành
+//    @Column(name = "progress_percentage", precision = 5, scale = 2)
+//    BigDecimal progressPercentage; // Phần trăm hoàn thành
 
-    @CreationTimestamp
+    @UpdateTimestamp
     @Column(name = "last_watched_at")
     LocalDateTime lastWatchedAt;
 
-    @Column(name = "completed")
-    Boolean completed = false;
+//    @Column(name = "completed")
+//    Boolean completed = false;
 }
 

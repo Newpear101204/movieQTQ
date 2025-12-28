@@ -1,5 +1,6 @@
 package com.movie.movie.service;
 
+import com.movie.movie.model.dto.ChangePasswordDTO;
 import com.movie.movie.model.dto.LoginDTO;
 import com.movie.movie.model.dto.RegisterDTO;
 import com.movie.movie.model.dto.UpdateUserDTO;
@@ -15,8 +16,10 @@ public interface UsersService {
     void register (RegisterDTO registerDTO);
     List<UsersResponse> allUsers ();
     void deleteUser (Long id);
+    void changePassword(ChangePasswordDTO request);
     void updateUser ( UpdateUserDTO updateUserDTO);
     void addHistory (Long id);     // pending
     List<MovieResponse> movieOfWatchList();
     List<CastResponse> castOfWatchList();
+    UsersResponse getMyInfo();
 }

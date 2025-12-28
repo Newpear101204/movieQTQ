@@ -10,7 +10,9 @@ import com.movie.movie.model.response.SearchResponse;
 import com.movie.movie.service.GenresService;
 import com.movie.movie.service.MovieService;
 import com.movie.movie.service.PersonsService;
+import com.movie.movie.service.RecommendService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,10 +32,12 @@ public class MovieApi {
 
     @Autowired
     private PersonsService personsService;
+    @Autowired
+    private RecommendService recommendService;
 
 
     //api xử lí thanh tìm kiếm
-    @GetMapping
+    @PostMapping("/search")
     public SearchResponse getMovie(@RequestBody SearchMovieRequest searchMovieDTO) {
         SearchResponse searchResponse = new SearchResponse();
         searchResponse.setMovieSearch(movieService.getMovie(searchMovieDTO.getTextSearch()));
@@ -41,9 +45,17 @@ public class MovieApi {
         return searchResponse;
     }
 
+    // lay phim theo slug
+    @GetMapping("/detail/{slug}")
+    public ResponseEntity<MovieResponse> getMovieDetail(@PathVariable String slug) {
+        MovieResponse response = movieService.getMovieDetail(slug);
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping
-    public void addMovie(@RequestBody MovieResponse movieResponse){
+    public ResponseEntity<String> addMovie(@RequestBody MovieResponse movieResponse){
         movieService.addMovie(movieResponse);
+        return ResponseEntity.ok("Thêm phim thành công!");
     }
 
     @DeleteMapping("/{id}")
@@ -51,9 +63,10 @@ public class MovieApi {
         movieService.deleteMovie(id);
     }
 
-    @PatchMapping("/{id}")
-    public void updateMovie(@PathVariable int id, @RequestBody MovieResponse movieResponse) {
+    @PostMapping("/{id}")
+    public ResponseEntity<String> updateMovie(@PathVariable int id, @RequestBody MovieResponse movieResponse) {
         movieService.addMovie(movieResponse);
+        return ResponseEntity.ok("Thêm phim thành công!");
     }
 
     @GetMapping("/genre")
@@ -86,4 +99,19 @@ public class MovieApi {
         // cap nhat dien vien
     }
 
+    @PostMapping("/view/{id}")
+    public ResponseEntity<String> increaseView(@PathVariable Long id) {
+        movieService.increaseViewCount(id);
+        return ResponseEntity.ok("View increased");
+    }
+
+    @GetMapping("/trending")
+    public ResponseEntity<List<MovieResponse>> getTrending() {
+        return ResponseEntity.ok(movieService.getTrendingMovies());
+    }
+
+    @GetMapping("/recommend")
+    public ResponseEntity<List<MovieResponse>> getRecommendations() {
+        return ResponseEntity.ok(recommendService.getRecommendedMovies());
+    }
 }
